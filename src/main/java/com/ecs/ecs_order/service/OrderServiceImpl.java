@@ -21,6 +21,7 @@ import com.ecs.ecs_order.validations.AddressValidation;
 import com.ecs.ecs_order.validations.OrderValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +45,7 @@ public class OrderServiceImpl implements IOrderService {
     private CartItemRepository cartItemRepository;
 
     @Override
-    public OrderFinalDto getOrderById(int orderId) {
+    public OrderFinalDto getOrderById(Integer orderId) {
         Order order = orderRepository.findById(orderId).
                 orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
         List<OrderItemDto> orderItemDtoList = orderItemRepository.findByOrderId(order.getOrderId()).
@@ -53,7 +54,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderFinalDto> getAllOrdersByCustomerId(int customerId) {
+    public List<OrderFinalDto> getAllOrdersByCustomerId(Integer customerId) {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
         List<List<OrderItemDto>> listOfOrderItemsList = HelperFunctions.
                 getAllOrderItemsList(orders, orderItemRepository);
@@ -67,7 +68,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderFinalDto> getAllOrdersByProductId(int productId) {
+    public List<OrderFinalDto> getAllOrdersByProductId(Integer productId) {
         List<OrderItem> orderItems = orderItemRepository.findAllByProductId(productId);
         List<Order> orders = orderItems.stream().map(order -> orderRepository.findById(order.getOrderId()).orElse(null)).toList();
         List<List<OrderItemDto>> listOfOrderItemsList = HelperFunctions.
@@ -80,6 +81,11 @@ public class OrderServiceImpl implements IOrderService {
                         customerService,
                         productService)
                 ).collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean existsByProductId(Integer productId) {
+        return !getAllOrdersByProductId(productId).isEmpty();
     }
 
     @Override
@@ -181,8 +187,14 @@ public class OrderServiceImpl implements IOrderService {
 
     @Transactional
     @Override
-    public void deleteOrderById(int orderId) {
+    public void deleteOrderById(Integer orderId) {
         orderItemRepository.deleteByOrderId(orderId);
         orderRepository.deleteById(orderId);
+    }
+
+    @Override
+    public List<OrderItemDto> getOrderItemsByProductId(Integer productId) {
+        return orderItemRepository.findAllByProductId(productId)
+                .stream().map(OrderItemMapper::mapToOrderItemDto).toList();
     }
 }

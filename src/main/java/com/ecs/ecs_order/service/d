@@ -1,8 +1,0 @@
-
-        Cart cart = cartRepository.findById(cartDto.getCartDetails().getCartId()).
-                orElseThrow(() -> new ResourceNotFoundException("Cart Not Found!"));
-        if (cart.getClass().equals(Cart.class)) {
-            cartDto.getCartDetails().setCustomerId(cart.getCustomerId());
-            return validateAndSaveCart(cartDto);
-        }
-        return Constants.CartNotFound;

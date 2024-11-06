@@ -30,7 +30,7 @@ public class CartServiceImpl implements ICartService {
     private ProductService productService;
 
     @Override
-    public CartFinalDto getCartByCustomerId(int customerId) {
+    public CartFinalDto getCartByCustomerId(Integer customerId) {
         List<CartItem> cartItems = cartItemRepository.findAllByCustomerId(customerId);
         List<CartItemDto> cartItemDtoList = cartItems.stream().map(CartItemMapper::mapToCartItemDto).toList();
         return CartMapper.mapToCartFinalDto(customerId, cartItemDtoList, customerService, productService);
@@ -43,13 +43,18 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
-    public boolean deleteCartItem(int cartItemId) {
+    public boolean deleteCartItem(Integer cartItemId) {
         boolean cartItemExists = cartItemRepository.existsById(cartItemId);
         if (cartItemExists) {
             cartItemRepository.deleteById(cartItemId);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean isCartItemsExistsByProductId(Integer productId) {
+        return cartItemRepository.existsByProductId(productId);
     }
 
     private Object validateAndSaveCart(CartDto cartDto) {

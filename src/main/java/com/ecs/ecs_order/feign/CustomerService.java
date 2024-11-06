@@ -2,12 +2,13 @@ package com.ecs.ecs_order.feign;
 
 import com.ecs.ecs_order.dto.AddressDto;
 import com.ecs.ecs_order.dto.CustomerDto;
+import com.ecs.ecs_order.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@FeignClient("ECS-CUSTOMER")
+@FeignClient(name="ECS-CUSTOMER", configuration = FeignClientConfig.class)
 public interface CustomerService {
 
     @PostMapping("/api/customer/")
@@ -36,4 +37,7 @@ public interface CustomerService {
 
     @DeleteMapping("/api/address/deleteAddressByCustomerId/{id}")
     ResponseEntity<String> deleteAddressByCustomerId(@PathVariable("id") int customerId);
+
+    @GetMapping("/api/public/authentication/getByUsername/{username}")
+    ResponseEntity<UserDto> getUserByUsername(@PathVariable("username") String username);
 }

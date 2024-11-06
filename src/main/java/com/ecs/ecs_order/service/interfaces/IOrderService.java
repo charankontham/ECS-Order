@@ -2,17 +2,19 @@ package com.ecs.ecs_order.service.interfaces;
 
 import com.ecs.ecs_order.dto.OrderDto;
 import com.ecs.ecs_order.dto.OrderFinalDto;
+import com.ecs.ecs_order.dto.OrderItemDto;
 import com.ecs.ecs_order.dto.OrderRequest;
-
 import java.util.List;
 
 public interface IOrderService {
 
-    OrderFinalDto getOrderById(int orderId);
+    OrderFinalDto getOrderById(Integer orderId);
 
-    List<OrderFinalDto> getAllOrdersByCustomerId(int customerId);
+    List<OrderFinalDto> getAllOrdersByCustomerId(Integer customerId);
 
-    List<OrderFinalDto> getAllOrdersByProductId(int productId);
+    List<OrderFinalDto> getAllOrdersByProductId(Integer productId);
+
+    Boolean existsByProductId(Integer productId);
 
     List<OrderFinalDto> getAllOrders();
 
@@ -20,8 +22,8 @@ public interface IOrderService {
 
     Object updateOrder(OrderDto orderDto);
 
-//    Object updateOrder(OrderDto orderDto, boolean forceUpdate);
+    void deleteOrderById(Integer orderId);
 
-    void deleteOrderById(int orderId);
+    List<OrderItemDto> getOrderItemsByProductId(Integer productId);
 
 }

@@ -16,8 +16,13 @@ public class CartController {
     private ICartService ICartService;
 
     @GetMapping("/getCartByCustomerId/{id}")
-    public ResponseEntity<?> getCartByCustomerId(@PathVariable("id") int customerId) {
+    public ResponseEntity<?> getCartByCustomerId(@PathVariable("id") Integer customerId) {
         return ResponseEntity.ok(ICartService.getCartByCustomerId(customerId));
+    }
+
+    @GetMapping("/existsByProductId/{id}")
+    public ResponseEntity<Boolean> existsByProductId(@PathVariable("id") Integer productId) {
+        return ResponseEntity.ok(ICartService.isCartItemsExistsByProductId(productId));
     }
 
     @PostMapping
@@ -37,7 +42,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCartItem(@PathVariable("id") int cartItemId) {
+    public ResponseEntity<?> deleteCartItem(@PathVariable("id") Integer cartItemId) {
         boolean response = ICartService.deleteCartItem(cartItemId);
         if(response){
             return ResponseEntity.status(HttpStatus.OK).body("CartItem successfully deleted!");

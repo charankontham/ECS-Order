@@ -5,9 +5,11 @@ import com.ecs.ecs_order.dto.CartDto;
 
 public interface ICartService {
 
-    CartFinalDto getCartByCustomerId(int customerId);
+    CartFinalDto getCartByCustomerId(Integer customerId);
 
     Object addOrUpdateCartItem(CartDto cartDto);
 
-    boolean deleteCartItem(int cartItemId);
+    boolean deleteCartItem(Integer cartItemId);
+
+    boolean isCartItemsExistsByProductId(Integer productId);
 }
