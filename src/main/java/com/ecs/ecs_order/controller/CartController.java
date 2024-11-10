@@ -11,25 +11,24 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
-
     @Autowired
-    private ICartService ICartService;
+    private ICartService cartService;
 
     @GetMapping("/getCartByCustomerId/{id}")
     public ResponseEntity<?> getCartByCustomerId(@PathVariable("id") Integer customerId) {
-        return ResponseEntity.ok(ICartService.getCartByCustomerId(customerId));
+        return ResponseEntity.ok(cartService.getCartByCustomerId(customerId));
     }
 
     @GetMapping("/existsByProductId/{id}")
     public ResponseEntity<Boolean> existsByProductId(@PathVariable("id") Integer productId) {
-        return ResponseEntity.ok(ICartService.isCartItemsExistsByProductId(productId));
+        return ResponseEntity.ok(cartService.isCartItemsExistsByProductId(productId));
     }
 
     @PostMapping
     public ResponseEntity<?> addCart(@RequestBody CartDto cartDto) {
-        Object response = ICartService.addOrUpdateCartItem(cartDto);
+        Object response = cartService.addOrUpdateCartItem(cartDto);
         ResponseEntity<?> responseEntity = HelperFunctions.getResponseEntity(response);
-        if(responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+        if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
             return ResponseEntity.status(HttpStatus.CREATED).body(responseEntity.getBody());
         }
         return responseEntity;
@@ -37,16 +36,16 @@ public class CartController {
 
     @PutMapping
     public ResponseEntity<?> updateCart(@RequestBody CartDto cartDto) {
-        Object response = ICartService.addOrUpdateCartItem(cartDto);
+        Object response = cartService.addOrUpdateCartItem(cartDto);
         return HelperFunctions.getResponseEntity(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCartItem(@PathVariable("id") Integer cartItemId) {
-        boolean response = ICartService.deleteCartItem(cartItemId);
-        if(response){
-            return ResponseEntity.status(HttpStatus.OK).body("CartItem successfully deleted!");
-        }else{
+    public ResponseEntity<String> deleteCartItem(@PathVariable("id") Integer cartItemId) {
+        boolean response = cartService.deleteCartItem(cartItemId);
+        if (response) {
+            return ResponseEntity.status(HttpStatus.OK).body("CartItem deleted successfully!");
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("CartItem not found!");
         }
     }

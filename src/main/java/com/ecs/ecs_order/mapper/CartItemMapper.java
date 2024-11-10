@@ -12,6 +12,7 @@ public class CartItemMapper {
                 cartItem.getQuantity()
         );
     }
+
     public static CartItem mapToCartItem(CartItemDto cartItemDto) {
         return new CartItem(
                 cartItemDto.getCartItemId(),

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDate;
 
 @Setter
@@ -14,7 +15,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "order_details")
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
@@ -22,7 +22,7 @@ public class Order {
     @Column(name = "customer_id")
     private Integer customerId;
 
-    @Column(name ="address_id")
+    @Column(name = "address_id")
     private Integer addressId;
 
     @Column(name = "payment_type")

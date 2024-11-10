@@ -8,18 +8,10 @@ import com.ecs.ecs_order.util.Constants;
 import java.util.Objects;
 
 public class AddressValidation {
-    public static boolean validateAddress(AddressDto addressDto) {
-        return BasicValidation.stringValidation(addressDto.getStreet())
-                && BasicValidation.stringValidation(addressDto.getCity())
-                && BasicValidation.stringValidation(addressDto.getState())
-                && BasicValidation.stringValidation(addressDto.getZip())
-                && BasicValidation.stringValidation(addressDto.getCountry());
-    }
-
-    public static Object validateAddress(int addressId, int customerId, CustomerService customerService) {
+    public static Object validateAddress(Integer addressId, Integer customerId, CustomerService customerService) {
         try {
             AddressDto addressDto = customerService.getAddressById(addressId).getBody();
-            if (Objects.requireNonNull(addressDto).getCustomerId() != customerId) {
+            if (!Objects.equals(Objects.requireNonNull(addressDto).getCustomerId(), customerId)) {
                 return Constants.AddressNotFound;
             }
             return Constants.NoErrorFound;

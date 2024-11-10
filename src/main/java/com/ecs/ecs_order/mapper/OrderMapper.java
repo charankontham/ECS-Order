@@ -6,10 +6,10 @@ import com.ecs.ecs_order.dto.OrderItemDto;
 import com.ecs.ecs_order.entity.Order;
 import com.ecs.ecs_order.feign.CustomerService;
 import com.ecs.ecs_order.feign.ProductService;
+
 import java.util.List;
 
 public class OrderMapper {
-
     public static OrderDto toOrderDto(Order order) {
         return new OrderDto(
                 order.getOrderId(),
@@ -40,8 +40,7 @@ public class OrderMapper {
             Order order,
             List<OrderItemDto> orderItemDtoList,
             CustomerService customerService,
-            ProductService productService)
-    {
+            ProductService productService) {
         return new OrderFinalDto(
                 order.getOrderId(),
                 customerService.getCustomerById(order.getCustomerId()).getBody(),

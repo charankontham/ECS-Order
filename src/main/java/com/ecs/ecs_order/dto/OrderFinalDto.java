@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderFinalDto {
-    private int orderId;
+    private Integer orderId;
     private CustomerDto customer;
     private AddressDto shippingAddress;
     private List<ProductFinalDto> orderItems;

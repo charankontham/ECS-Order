@@ -11,10 +11,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
-    private int userId;
+    private Integer userId;
     private String username;
     private String password;
-
     @NotNull
     @NotBlank(message = "Role cannot be blank")
     @NotEmpty(message = "Role cannot be null")

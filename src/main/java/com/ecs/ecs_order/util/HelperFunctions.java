@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import java.util.*;
 
 @Setter
@@ -30,11 +31,11 @@ public class HelperFunctions {
         return set.size() == list.size();
     }
 
-    public static List<ProductFinalDto> getProductFinalDtoList( List<Integer> productIdsList, ProductService productService) {
+    public static List<ProductFinalDto> getProductFinalDtoList(List<Integer> productIdsList, ProductService productService) {
         return productIdsList.
                 stream().map(productService::getProductById).toList().
                 stream().filter((response) -> {
-                    if(Objects.equals(response.getStatusCode(), HttpStatus.OK)){
+                    if (Objects.equals(response.getStatusCode(), HttpStatus.OK)) {
                         return true;
                     } else {
                         throw new ResourceNotFoundException("Product not found");
@@ -45,36 +46,37 @@ public class HelperFunctions {
 
     public static ResponseEntity<?> getResponseEntity(Object response) {
         if (Objects.equals(response, Constants.ProductNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found!");
         } else if (Objects.equals(response, Constants.CustomerNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found!");
         } else if (Objects.equals(response, Constants.ProductQuantityExceeded)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ProductQuantities Exceeded!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product quantities exceeded!");
         } else if (Objects.equals(response, Constants.AddressNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address not found!");
         } else if (Objects.equals(response, Constants.OrderNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found!");
         } else if (Objects.equals(response, Constants.CartItemNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("CartItem Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("CartItem not found!");
         } else if (Objects.equals(response, Constants.UserNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
         } else if (Objects.equals(response, Constants.ProductCategoryNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductCategory Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product category not found!");
         } else if (Objects.equals(response, Constants.ProductBrandNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductBrand Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductBrand not found!");
         } else if (Objects.equals(response, Constants.ProductReviewNotFound)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ProductReview Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product review not found!");
         } else if (Objects.equals(response, HttpStatus.CONFLICT)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Duplicate Entry!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Duplicate entry!");
         } else if (Objects.equals(response, HttpStatus.BAD_REQUEST)) {
-            return new ResponseEntity<>("Validation Failed/Bad Request!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Validation failed/Bad request!", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public static List<List<OrderItemDto>> getAllOrderItemsList(List<Order> orderList, OrderItemRepository orderItemRepository) {
+    public static List<List<OrderItemDto>> getAllOrderItemsList(List<Order> orderList,
+                                                                OrderItemRepository orderItemRepository) {
         List<List<OrderItemDto>> allOrderItemsList = new ArrayList<>();
-        for(Order order : orderList) {
+        for (Order order : orderList) {
             allOrderItemsList.add(getOrderItemsList(order.getOrderId(), orderItemRepository));
         }
         return allOrderItemsList;
@@ -88,10 +90,9 @@ public class HelperFunctions {
                                                               List<Integer> productIds,
                                                               List<Integer> quantityList,
                                                               ProductService productService,
-                                                              CustomerService customerService)
-    {
+                                                              CustomerService customerService) {
         try {
-            boolean customerExists = customerService.getCustomerById(customerId).getStatusCode()== HttpStatus.OK;
+            boolean customerExists = customerService.getCustomerById(customerId).getStatusCode() == HttpStatus.OK;
             if (!customerExists) {
                 return Constants.CustomerNotFound;
             }
@@ -102,7 +103,7 @@ public class HelperFunctions {
             int count = 0;
             for (ProductFinalDto inventoryProduct : productFinalDtoList) {
                 if (quantityList.get(count++) > inventoryProduct.getProductQuantity()) {
-                    throw new RuntimeException("Product Quantity Exceeded!");
+                    throw new RuntimeException("Product quantity exceeded!");
                 }
             }
             return Constants.NoErrorFound;
@@ -113,7 +114,7 @@ public class HelperFunctions {
             System.out.println("Error: " + e.getMessage());
             return HttpStatus.BAD_REQUEST;
         } catch (RuntimeException e) {
-            if (e.getMessage().contains("Quantity Exceeded!")) {
+            if (e.getMessage().contains("quantity exceeded!")) {
                 return Constants.ProductQuantityExceeded;
             } else {
                 System.out.println("Error: " + e.getMessage());
@@ -121,28 +122,4 @@ public class HelperFunctions {
             }
         }
     }
-
-    public static boolean isFutureOrToday(Date date) {
-        Calendar todayDate = removeTimeFromDate(new Date());
-        Calendar givenDate = removeTimeFromDate(date);
-
-        return !givenDate.before(todayDate);
-    }
-
-    public static boolean isToday(Date date){
-        Calendar todayDate = removeTimeFromDate(new Date());
-        Calendar givenDate = removeTimeFromDate(date);
-        return givenDate.equals(todayDate);
-    }
-
-    public static Calendar removeTimeFromDate(Date givenDate) {
-        Calendar calendarDate = Calendar.getInstance();
-        calendarDate.setTime(givenDate);
-        calendarDate.set(Calendar.HOUR_OF_DAY, 0);
-        calendarDate.set(Calendar.MINUTE, 0);
-        calendarDate.set(Calendar.SECOND, 0);
-        calendarDate.set(Calendar.MILLISECOND, 0);
-        return calendarDate;
-    }
-
 }

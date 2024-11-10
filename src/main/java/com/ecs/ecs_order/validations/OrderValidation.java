@@ -6,6 +6,7 @@ import com.ecs.ecs_order.dto.OrderRequest;
 import com.ecs.ecs_order.feign.CustomerService;
 import com.ecs.ecs_order.feign.ProductService;
 import com.ecs.ecs_order.util.HelperFunctions;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -17,8 +18,7 @@ public class OrderValidation {
                 !orderRequest.getOrderItems().isEmpty() &&
                 validateOrderDtoSchema(orderRequest.getOrderDetails()) &&
                 HelperFunctions.checkZeroQuantities(
-                        orderRequest.getOrderItems().
-                                stream().map(OrderItemDto::getQuantity).toList()) &&
+                        orderRequest.getOrderItems().stream().map(OrderItemDto::getQuantity).toList()) &&
                 checkDuplicateOrderItem(orderRequest.getOrderItems()) &&
                 validateOrderItemsList(orderRequest.getOrderItems()) &&
                 BasicValidation.stringValidation(orderRequest.getOrderDetails().getShippingStatus()) &&
@@ -63,14 +63,14 @@ public class OrderValidation {
             ProductService productService,
             CustomerService customerService
     ) {
-            List<Integer> productIds = orderItemDtoList.stream().map(OrderItemDto::getProductId).toList();
-            List<Integer> quantityList = orderItemDtoList.stream().map(OrderItemDto::getQuantity).toList();
-            return HelperFunctions.validateCustomerAndProductQuantities(
-                    customerId,
-                    productIds,
-                    quantityList,
-                    productService,
-                    customerService
-            );
+        List<Integer> productIds = orderItemDtoList.stream().map(OrderItemDto::getProductId).toList();
+        List<Integer> quantityList = orderItemDtoList.stream().map(OrderItemDto::getQuantity).toList();
+        return HelperFunctions.validateCustomerAndProductQuantities(
+                customerId,
+                productIds,
+                quantityList,
+                productService,
+                customerService
+        );
     }
 }

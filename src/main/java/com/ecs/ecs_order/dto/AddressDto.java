@@ -10,8 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDto {
-    private int addressId;
-    private int customerId;
+    private Integer addressId;
+    private Integer customerId;
     private String street;
     private String city;
     private String state;

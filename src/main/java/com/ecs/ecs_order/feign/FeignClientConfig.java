@@ -10,7 +10,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 public class FeignClientConfig {
-
     @Bean
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {

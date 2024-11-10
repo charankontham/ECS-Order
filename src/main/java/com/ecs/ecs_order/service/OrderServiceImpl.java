@@ -21,7 +21,6 @@ import com.ecs.ecs_order.validations.AddressValidation;
 import com.ecs.ecs_order.validations.OrderValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements IOrderService {
-
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
@@ -70,7 +68,8 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public List<OrderFinalDto> getAllOrdersByProductId(Integer productId) {
         List<OrderItem> orderItems = orderItemRepository.findAllByProductId(productId);
-        List<Order> orders = orderItems.stream().map(order -> orderRepository.findById(order.getOrderId()).orElse(null)).toList();
+        List<Order> orders = orderItems.stream().
+                map(order -> orderRepository.findById(order.getOrderId()).orElse(null)).toList();
         List<List<OrderItemDto>> listOfOrderItemsList = HelperFunctions.
                 getAllOrderItemsList(orders, orderItemRepository);
         AtomicInteger index = new AtomicInteger();
@@ -94,10 +93,7 @@ public class OrderServiceImpl implements IOrderService {
         return orders.stream().
                 map((order) -> {
                     List<OrderItemDto> orderItemsList = HelperFunctions.
-                            getOrderItemsList(
-                                    order.getOrderId(),
-                                    orderItemRepository
-                            );
+                            getOrderItemsList(order.getOrderId(), orderItemRepository);
                     return OrderMapper.toOrderFinalDto(order, orderItemsList, customerService, productService);
                 }).collect(Collectors.toList());
     }
@@ -116,11 +112,11 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public Object updateOrder(OrderDto orderDto) {
-        if(Objects.isNull(orderDto.getOrderId())) {
+        if (Objects.isNull(orderDto.getOrderId())) {
             throw new ResourceNotFoundException("OrderId not found!");
         }
         Order order = orderRepository.findById(orderDto.getOrderId()).
-                orElseThrow(() -> new ResourceNotFoundException("Order Not Found!"));
+                orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
         if (order.getClass().equals(Order.class)) {
             OrderDto existingOrderDto = OrderMapper.toOrderDto(order);
             orderDto.setCustomerId(existingOrderDto.getCustomerId());
@@ -162,12 +158,8 @@ public class OrderServiceImpl implements IOrderService {
                 Order savedOrder = orderRepository.save(OrderMapper.toOrder(orderRequest.getOrderDetails()));
                 orderRequest.getOrderItems()
                         .forEach(orderItem -> orderItem.setOrderId(savedOrder.getOrderId()));
-                orderItemRepository.saveAll(
-                        orderRequest.getOrderItems().
-                                stream().
-                                map(OrderItemMapper::mapToOrderItem).
-                                toList()
-                );
+                orderItemRepository.saveAll(orderRequest.getOrderItems().stream().
+                        map(OrderItemMapper::mapToOrderItem).toList());
                 orderRequest.getOrderItems().forEach(orderItem -> cartItemRepository.
                         deleteByCustomerIdAndProductId(
                                 orderRequest.getOrderDetails().getCustomerId(),
@@ -194,7 +186,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public List<OrderItemDto> getOrderItemsByProductId(Integer productId) {
-        return orderItemRepository.findAllByProductId(productId)
-                .stream().map(OrderItemMapper::mapToOrderItemDto).toList();
+        return orderItemRepository.findAllByProductId(productId).stream().
+                map(OrderItemMapper::mapToOrderItemDto).toList();
     }
 }

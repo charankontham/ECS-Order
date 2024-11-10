@@ -6,37 +6,14 @@ import com.ecs.ecs_order.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
-@FeignClient(name="ECS-CUSTOMER", configuration = FeignClientConfig.class)
+@FeignClient(name = "ECS-CUSTOMER", configuration = FeignClientConfig.class)
 public interface CustomerService {
-
-    @PostMapping("/api/customer/")
-    ResponseEntity<?> addCustomer(@RequestBody CustomerDto customerDto);
-
-    @GetMapping("/api/customer/")
-    ResponseEntity<List<CustomerDto>> getAllCustomers();
-
     @GetMapping("/api/customer/{id}")
-    ResponseEntity<CustomerDto> getCustomerById(@PathVariable("id") int customerId);
-
-    @RequestMapping(value = "/api/customer/getByEmail", method = RequestMethod.GET, params="email")
-    ResponseEntity<CustomerDto> getCustomerByEmail(@RequestParam("email") String email);
-
-    @PutMapping("/api/customer")
-    ResponseEntity<?> updateCustomer(@RequestBody CustomerDto customerDto);
-
-    @DeleteMapping("/api/customer/{id}")
-    ResponseEntity<String> deleteCustomer(@PathVariable("id") int customerId);
-
-    @GetMapping("/api/customer/login")
-    ResponseEntity<Object> customerLogin(@RequestParam String email, @RequestParam String password);
+    ResponseEntity<CustomerDto> getCustomerById(@PathVariable("id") Integer customerId);
 
     @GetMapping("/api/address/{id}")
-    ResponseEntity<AddressDto> getAddressById(@PathVariable("id") int addressId);
-
-    @DeleteMapping("/api/address/deleteAddressByCustomerId/{id}")
-    ResponseEntity<String> deleteAddressByCustomerId(@PathVariable("id") int customerId);
+    ResponseEntity<AddressDto> getAddressById(@PathVariable("id") Integer addressId);
 
     @GetMapping("/api/public/authentication/getByUsername/{username}")
     ResponseEntity<UserDto> getUserByUsername(@PathVariable("username") String username);

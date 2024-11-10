@@ -5,6 +5,7 @@ import com.ecs.ecs_order.dto.CartItemDto;
 import com.ecs.ecs_order.feign.CustomerService;
 import com.ecs.ecs_order.feign.ProductService;
 import com.ecs.ecs_order.util.HelperFunctions;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -14,10 +15,7 @@ public class CartValidation {
                 Objects.nonNull(cartDto.getCustomerId()) &&
                 !cartDto.getCartItems().isEmpty() &&
                 HelperFunctions.checkZeroQuantities(
-                        cartDto.getCartItems().
-                                stream().
-                                map(CartItemDto::getQuantity).
-                                toList()) &&
+                        cartDto.getCartItems().stream().map(CartItemDto::getQuantity).toList()) &&
                 checkDuplicateCartItem(cartDto.getCartItems()) &&
                 validateCartItemsList(cartDto.getCartItems()) &&
                 checkCustomerIntegrity(cartDto);
@@ -35,8 +33,7 @@ public class CartValidation {
 
     public static boolean validateCartItemsList(List<CartItemDto> cartItemDtoList) {
         return cartItemDtoList.stream().
-                filter(CartValidation::validateCartItemRequestSchema).
-                toList().size() == cartItemDtoList.size();
+                filter(CartValidation::validateCartItemRequestSchema).toList().size() == cartItemDtoList.size();
     }
 
     public static Object validateCustomerAndCartItems(
