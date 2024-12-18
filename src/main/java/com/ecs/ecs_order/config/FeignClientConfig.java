@@ -1,4 +1,4 @@
-package com.ecs.ecs_order.feign;
+package com.ecs.ecs_order.config;
 
 import feign.RequestInterceptor;
 import jakarta.servlet.http.HttpServletRequest;

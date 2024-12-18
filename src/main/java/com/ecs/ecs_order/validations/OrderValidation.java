@@ -8,6 +8,7 @@ import com.ecs.ecs_order.feign.ProductService;
 import com.ecs.ecs_order.util.HelperFunctions;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,8 +25,8 @@ public class OrderValidation {
                 BasicValidation.stringValidation(orderRequest.getOrderDetails().getShippingStatus()) &&
                 BasicValidation.stringValidation(orderRequest.getOrderDetails().getPaymentType()) &&
                 BasicValidation.stringValidation(orderRequest.getOrderDetails().getPaymentStatus()) &&
-                Objects.nonNull(orderRequest.getOrderDetails().getOrderDate()) &&
-                orderRequest.getOrderDetails().getOrderDate().isEqual(LocalDate.now());
+                Objects.nonNull(orderRequest.getOrderDetails().getOrderDate());// &&
+//                orderRequest.getOrderDetails().getOrderDate().toLocalDate().isEqual(LocalDate.now());
     }
 
     public static boolean validateOrderItemRequestSchema(OrderItemDto orderItemDto) {
@@ -52,9 +53,9 @@ public class OrderValidation {
                 Objects.nonNull(orderDto.getDeliveryDate()) &&
                 BasicValidation.stringValidation(orderDto.getPaymentStatus()) &&
                 BasicValidation.stringValidation(orderDto.getPaymentType()) &&
-                BasicValidation.stringValidation(orderDto.getShippingStatus()) &&
-                (orderDto.getDeliveryDate().isAfter(LocalDate.now()) ||
-                        orderDto.getDeliveryDate().isEqual(LocalDate.now()));
+                BasicValidation.stringValidation(orderDto.getShippingStatus());// &&
+//                (orderDto.getDeliveryDate().toLocalDate().isAfter(LocalDate.now()) ||
+//                        orderDto.getDeliveryDate().toLocalDate().isEqual(LocalDate.now()));
     }
 
     public static Object validateCustomerAndOrderItems(

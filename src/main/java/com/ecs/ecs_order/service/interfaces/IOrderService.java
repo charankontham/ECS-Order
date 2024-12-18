@@ -5,6 +5,7 @@ import com.ecs.ecs_order.dto.OrderFinalDto;
 import com.ecs.ecs_order.dto.OrderItemDto;
 import com.ecs.ecs_order.dto.OrderRequest;
 
+import java.io.File;
 import java.util.List;
 
 public interface IOrderService {
@@ -20,10 +21,11 @@ public interface IOrderService {
 
     Object addOrder(OrderRequest orderRequest);
 
-    Object updateOrder(OrderDto orderDto);
+    Object updateOrder(OrderDto orderDto) throws Exception;
 
     void deleteOrderById(Integer orderId);
 
     List<OrderItemDto> getOrderItemsByProductId(Integer productId);
 
+    Object downloadOrderInvoice(Integer invoiceId);
 }

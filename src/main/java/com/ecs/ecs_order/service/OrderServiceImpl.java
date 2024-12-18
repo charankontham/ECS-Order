@@ -1,9 +1,6 @@
 package com.ecs.ecs_order.service;
 
-import com.ecs.ecs_order.dto.OrderDto;
-import com.ecs.ecs_order.dto.OrderFinalDto;
-import com.ecs.ecs_order.dto.OrderItemDto;
-import com.ecs.ecs_order.dto.OrderRequest;
+import com.ecs.ecs_order.dto.*;
 import com.ecs.ecs_order.entity.Order;
 import com.ecs.ecs_order.entity.OrderItem;
 import com.ecs.ecs_order.exception.ResourceNotFoundException;
@@ -24,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +39,10 @@ public class OrderServiceImpl implements IOrderService {
     private OrderItemRepository orderItemRepository;
     @Autowired
     private CartItemRepository cartItemRepository;
+    @Autowired
+    private InvoiceGeneratorService invoiceGeneratorService;
+    @Autowired
+    private S3Service s3Service;
 
     @Override
     public OrderFinalDto getOrderById(Integer orderId) {
@@ -111,7 +113,8 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public Object updateOrder(OrderDto orderDto) {
+    public Object updateOrder(OrderDto orderDto) throws Exception {
+        System.out.println("Entered into updateOrder method");
         if (Objects.isNull(orderDto.getOrderId())) {
             throw new ResourceNotFoundException("OrderId not found!");
         }
@@ -122,14 +125,46 @@ public class OrderServiceImpl implements IOrderService {
             orderDto.setCustomerId(existingOrderDto.getCustomerId());
             orderDto.setAddressId(existingOrderDto.getAddressId());
             orderDto.setOrderDate(existingOrderDto.getOrderDate());
+            System.out.println("Order found and continuing");
             return validateAndUpdateOrder(orderDto);
         }
         return Constants.OrderNotFound;
     }
 
-    private Object validateAndUpdateOrder(OrderDto orderDto) {
+    private Object validateAndUpdateOrder(OrderDto orderDto) throws Exception {
         if (!OrderValidation.validateOrderDtoSchema(orderDto)) {
             return HttpStatus.BAD_REQUEST;
+        }
+        if (orderDto.getShippingStatus().equals("Shipped")) {
+            System.out.println("=== entered into invoice generation block ===");
+            InvoiceData invoiceData = new InvoiceData();
+            List<OrderItemDto> orderItems = orderItemRepository
+                    .findByOrderId(orderDto.getOrderId()).stream().map(OrderItemMapper::mapToOrderItemDto).toList();
+            AddressDto address = customerService.getAddressById(
+                    orderDto.getAddressId()
+            ).getBody();
+            invoiceData.setProducts(
+                    HelperFunctions.convertFromOrderItemsToProductDtoList(
+                            orderItems,
+                            productService
+                    ));
+            invoiceData.setBillingAddress(
+                    address
+            );
+            invoiceData.setShippingAddress(address);
+            invoiceData.setOrderDate(orderDto.getOrderDate());
+            invoiceData.setOrderDate(orderDto.getDeliveryDate());
+            invoiceData.setTotalTax(HelperFunctions.calculateTotalTax(orderItems));
+            invoiceData.setTotalOrderValue(HelperFunctions.calculateTotalPrice(orderItems));
+            invoiceData.setOrderId(orderDto.getOrderId());
+            System.out.println("=== Ready to generate invoice ===");
+            invoiceGeneratorService.generateInvoice("invoice.pdf", invoiceData);
+            System.out.println("=== Invoice Generated! ===");
+            File file = new File("invoice.pdf");
+            String key = "invoices/invoice_" + orderDto.getOrderId() + ".pdf";
+            String s3Url = s3Service.uploadFile(file, key);
+            file.delete();
+            System.out.println(s3Url);
         }
         Order updatedOrder = orderRepository.save(OrderMapper.toOrder(orderDto));
         List<OrderItemDto> orderItemsList = HelperFunctions.getOrderItemsList(
@@ -188,5 +223,25 @@ public class OrderServiceImpl implements IOrderService {
     public List<OrderItemDto> getOrderItemsByProductId(Integer productId) {
         return orderItemRepository.findAllByProductId(productId).stream().
                 map(OrderItemMapper::mapToOrderItemDto).toList();
+    }
+
+    @Override
+    public Object downloadOrderInvoice(Integer invoiceId) {
+        boolean orderExists = orderRepository.existsById(invoiceId);
+        if (orderExists) {
+            Order order = orderRepository.findById(invoiceId).orElse(null);
+            if(order != null && order.getShippingStatus().equals("OrderPlaced")) {
+                return Constants.OrderInvoiceNotGenerated;
+            }
+            String key = "invoices/invoice_" + invoiceId + ".pdf";
+            Object fileResponse = s3Service.downloadFile(key, "invoices/invoice_" + invoiceId + ".pdf");
+            if(fileResponse.equals(HttpStatus.NOT_FOUND)) {
+                return HttpStatus.NOT_FOUND;
+            }else{
+                return fileResponse;
+            }
+        } else {
+            return Constants.OrderNotFound;
+        }
     }
 }

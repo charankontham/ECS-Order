@@ -12,6 +12,8 @@ import lombok.Setter;
 public class AddressDto {
     private Integer addressId;
     private Integer customerId;
+    private String name;
+    private String contact;
     private String street;
     private String city;
     private String state;

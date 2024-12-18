@@ -6,6 +6,7 @@ import com.ecs.ecs_order.dto.OrderItemDto;
 import com.ecs.ecs_order.entity.Order;
 import com.ecs.ecs_order.feign.CustomerService;
 import com.ecs.ecs_order.feign.ProductService;
+import com.ecs.ecs_order.util.HelperFunctions;
 
 import java.util.List;
 
@@ -46,11 +47,14 @@ public class OrderMapper {
                 customerService.getCustomerById(order.getCustomerId()).getBody(),
                 customerService.getAddressById(order.getAddressId()).getBody(),
                 ProductMapper.getProductFinalDtoListWithOrderItems(orderItemDtoList, productService),
-                order.getPaymentType(),
-                order.getPaymentStatus(),
+                HelperFunctions.calculateSubTotalPrice(orderItemDtoList),
+                HelperFunctions.calculateTotalTax(orderItemDtoList),
+                HelperFunctions.calculateTotalPrice(orderItemDtoList),
                 order.getOrderDate(),
                 order.getDeliveryDate(),
-                order.getShippingStatus()
+                order.getShippingStatus(),
+                order.getPaymentType(),
+                order.getPaymentStatus()
         );
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Setter
 public class HelperFunctions {
@@ -121,5 +122,41 @@ public class HelperFunctions {
                 return HttpStatus.BAD_REQUEST;
             }
         }
+    }
+
+    public static List<ProductFinalDto> convertFromOrderItemsToProductDtoList(
+            List<OrderItemDto> orderItems,
+            ProductService productService) {
+        return orderItems.stream().map(
+                (x) -> {
+                    ProductFinalDto product = productService.getProductById(x.getProductId()).getBody();
+                    assert product != null;
+                    product.setProductQuantity(x.getQuantity());
+                    product.setProductPrice(x.getProductPrice());
+                    return product;
+                }
+        ).toList();
+    }
+
+    public static Float calculateSubTotalPrice(List<OrderItemDto> orderItems) {
+        AtomicReference<Float> subTotalPrice = new AtomicReference<>(0f);
+        orderItems.forEach(
+                (oderItem) -> subTotalPrice.
+                        updateAndGet(v -> v + (oderItem.getProductPrice()))
+        );
+        return subTotalPrice.get();
+    }
+
+    public static Float calculateTotalPrice(List<OrderItemDto> orderItems) {
+         return calculateSubTotalPrice(orderItems) + calculateTotalTax(orderItems);
+    }
+
+    public static Float calculateTotalTax(List<OrderItemDto> orderItems) {
+        AtomicReference<Float> totalTax = new AtomicReference<>(0f);
+        orderItems.forEach(
+                (x) -> totalTax.
+                        updateAndGet(v -> v + (x.getProductPrice() * 0.07f))
+        );
+        return totalTax.get();
     }
 }

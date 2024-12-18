@@ -18,4 +18,5 @@ public class Constants {
     public final static int NoErrorFound = 10;
     public final static int ProductReviewNotFound = 11;
     public final static int ProductBrandNotFound = 12;
+    public final static int OrderInvoiceNotGenerated = 13;
 }

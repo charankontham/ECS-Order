@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -32,10 +33,10 @@ public class Order {
     private String paymentStatus;
 
     @Column(name = "ordered_date")
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
 
     @Column(name = "delivery_date")
-    private LocalDate deliveryDate;
+    private LocalDateTime deliveryDate;
 
     @Column(name = "delivery_status")
     private String shippingStatus;

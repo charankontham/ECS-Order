@@ -1,5 +1,6 @@
 package com.ecs.ecs_order.feign;
 
+import com.ecs.ecs_order.config.FeignClientConfig;
 import com.ecs.ecs_order.dto.ProductFinalDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;

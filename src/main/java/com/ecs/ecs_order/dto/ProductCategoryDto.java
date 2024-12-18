@@ -12,4 +12,5 @@ import lombok.Setter;
 public class ProductCategoryDto {
     private Integer categoryId;
     private String categoryName;
+    private String categoryImage;
 }

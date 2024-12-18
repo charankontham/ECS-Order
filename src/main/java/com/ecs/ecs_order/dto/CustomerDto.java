@@ -13,5 +13,7 @@ public class CustomerDto {
     private Integer customerId;
     private String customerName;
     private String email;
+    private String phone;
     private String password;
+    private String role;
 }

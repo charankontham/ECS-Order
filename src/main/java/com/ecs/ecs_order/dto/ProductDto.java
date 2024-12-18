@@ -17,6 +17,7 @@ public class ProductDto {
     private String productDescription;
     private Float productPrice;
     private Integer productQuantity;
+    private String productImage;
     private String productColor;
     private Float productWeight;
     private String productDimensions;
