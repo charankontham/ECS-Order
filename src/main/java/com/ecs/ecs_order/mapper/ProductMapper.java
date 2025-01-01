@@ -28,7 +28,7 @@ public class ProductMapper {
             ProductService productService) {
         List<ProductFinalDto> productFinalDtoList = HelperFunctions.
                 getProductFinalDtoList(Collections.singletonList(cartItemDto.getProductId()), productService);
-        productFinalDtoList.get(0).setProductQuantity(cartItemDto.getQuantity());
+//        productFinalDtoList.get(0).setProductQuantity(cartItemDto.getQuantity());
         return productFinalDtoList.get(0);
     }
 }

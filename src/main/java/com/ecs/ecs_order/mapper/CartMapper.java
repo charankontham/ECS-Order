@@ -7,7 +7,6 @@ import com.ecs.ecs_order.exception.ResourceNotFoundException;
 import com.ecs.ecs_order.feign.CustomerService;
 import com.ecs.ecs_order.feign.ProductService;
 import org.springframework.http.HttpStatus;
-
 import java.util.List;
 
 public class CartMapper {
@@ -28,7 +27,8 @@ public class CartMapper {
     public static CartItemEnrichedDto mapToCartItemEnrichedDto(CartItemDto cartItemDto, ProductService productService) {
         return new CartItemEnrichedDto(
                 cartItemDto.getCartItemId(),
-                ProductMapper.getProductFinalDtoListWithCartItem(cartItemDto, productService)
+                ProductMapper.getProductFinalDtoListWithCartItem(cartItemDto, productService),
+                cartItemDto.getQuantity()
         );
     }
 }

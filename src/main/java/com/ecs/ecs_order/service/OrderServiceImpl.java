@@ -234,7 +234,7 @@ public class OrderServiceImpl implements IOrderService {
                 return Constants.OrderInvoiceNotGenerated;
             }
             String key = "invoices/invoice_" + invoiceId + ".pdf";
-            Object fileResponse = s3Service.downloadFile(key, "invoices/invoice_" + invoiceId + ".pdf");
+            Object fileResponse = s3Service.downloadFile(key, "invoice_" + invoiceId + ".pdf");
             if(fileResponse.equals(HttpStatus.NOT_FOUND)) {
                 return HttpStatus.NOT_FOUND;
             }else{

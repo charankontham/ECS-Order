@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -28,7 +27,6 @@ public class CartServiceImpl implements ICartService {
     private CustomerService customerService;
     @Autowired
     private ProductService productService;
-
     @Override
     public CartFinalDto getCartByCustomerId(Integer customerId) {
         List<CartItem> cartItems = cartItemRepository.findAllByCustomerId(customerId);
@@ -67,10 +65,10 @@ public class CartServiceImpl implements ICartService {
                 customerService
         );
         if (Objects.equals(response, Constants.NoErrorFound)) {
-            cartItemRepository.saveAll(cartDto.getCartItems().stream().map(CartItemMapper::mapToCartItem).toList());
+            List<CartItem> savedCartItems = cartItemRepository.saveAll(cartDto.getCartItems().stream().map(CartItemMapper::mapToCartItem).toList());
             return CartMapper.mapToCartFinalDto(
                     cartDto.getCustomerId(),
-                    cartDto.getCartItems(),
+                    savedCartItems.stream().map(CartItemMapper::mapToCartItemDto).toList(),
                     customerService,
                     productService
             );

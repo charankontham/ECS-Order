@@ -12,4 +12,5 @@ import lombok.Setter;
 public class CartItemEnrichedDto {
     private Integer cartItemId;
     private ProductFinalDto productDetails;
+    private Integer orderQuantity;
 }
