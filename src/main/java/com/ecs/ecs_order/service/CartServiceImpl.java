@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +28,8 @@ public class CartServiceImpl implements ICartService {
     private CustomerService customerService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     @Override
     public CartFinalDto getCartByCustomerId(Integer customerId) {
         List<CartItem> cartItems = cartItemRepository.findAllByCustomerId(customerId);
@@ -44,7 +47,9 @@ public class CartServiceImpl implements ICartService {
     public boolean deleteCartItem(Integer cartItemId) {
         boolean cartItemExists = cartItemRepository.existsById(cartItemId);
         if (cartItemExists) {
+            Integer customerId = cartItemRepository.findById(cartItemId).get().getCustomerId();
             cartItemRepository.deleteById(cartItemId);
+            messagingTemplate.convertAndSend("/topic/messages", getCartByCustomerId(customerId));
             return true;
         }
         return false;
@@ -65,13 +70,18 @@ public class CartServiceImpl implements ICartService {
                 customerService
         );
         if (Objects.equals(response, Constants.NoErrorFound)) {
-            List<CartItem> savedCartItems = cartItemRepository.saveAll(cartDto.getCartItems().stream().map(CartItemMapper::mapToCartItem).toList());
-            return CartMapper.mapToCartFinalDto(
+            List<CartItem> savedCartItems = cartItemRepository.
+                    saveAll(cartDto.getCartItems().stream().map(CartItemMapper::mapToCartItem).toList());
+
+            Object finalResponse =  CartMapper.mapToCartFinalDto(
                     cartDto.getCustomerId(),
                     savedCartItems.stream().map(CartItemMapper::mapToCartItemDto).toList(),
                     customerService,
                     productService
             );
+            messagingTemplate.
+                    convertAndSend("/topic/messages", getCartByCustomerId(cartDto.getCustomerId()));
+            return finalResponse;
         }
         return response;
     }
