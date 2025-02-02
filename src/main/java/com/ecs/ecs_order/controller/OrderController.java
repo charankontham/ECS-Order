@@ -1,9 +1,5 @@
 package com.ecs.ecs_order.controller;
-
-import com.ecs.ecs_order.dto.OrderDto;
-import com.ecs.ecs_order.dto.OrderFinalDto;
-import com.ecs.ecs_order.dto.OrderItemDto;
-import com.ecs.ecs_order.dto.OrderRequest;
+import com.ecs.ecs_order.dto.*;
 import com.ecs.ecs_order.service.interfaces.IOrderService;
 import com.ecs.ecs_order.util.Constants;
 import com.ecs.ecs_order.util.HelperFunctions;
@@ -12,16 +8,13 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/order")
@@ -56,6 +49,12 @@ public class OrderController {
     @GetMapping("/getOrderItemsByProductId/{id}")
     public ResponseEntity<List<OrderItemDto>> getOrderItemsByProductId(@PathVariable("id") Integer productId) {
         List<OrderItemDto> orderItems = orderService.getOrderItemsByProductId(productId);
+        return new ResponseEntity<>(orderItems, HttpStatus.OK);
+    }
+
+    @GetMapping("/getOrderItemsByCustomerId/{id}")
+    public ResponseEntity<List<ProductFinalDto>> getOrderItemsByCustomerId(@PathVariable("id") Integer customerId) {
+        List<ProductFinalDto> orderItems = orderService.getOrderItemsByCustomerId(customerId);
         return new ResponseEntity<>(orderItems, HttpStatus.OK);
     }
 
@@ -98,7 +97,11 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<?> addOrder(@RequestBody OrderRequest orderRequest) {
         Object response = orderService.addOrder(orderRequest);
-        return HelperFunctions.getResponseEntity(response);
+        ResponseEntity<?> responseEntity = HelperFunctions.getResponseEntity(response);
+        if(responseEntity.getStatusCode() == HttpStatus.OK){
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseEntity.getBody());
+        }
+        return responseEntity;
     }
 
     @PutMapping

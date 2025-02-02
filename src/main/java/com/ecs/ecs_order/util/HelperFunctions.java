@@ -147,8 +147,8 @@ public class HelperFunctions {
         return subTotalPrice.get();
     }
 
-    public static Float calculateTotalPrice(List<OrderItemDto> orderItems) {
-         return calculateSubTotalPrice(orderItems) + calculateTotalTax(orderItems);
+    public static Float calculateTotalPrice(List<OrderItemDto> orderItems, Float shippingFee) {
+         return calculateSubTotalPrice(orderItems) + calculateTotalTax(orderItems) + shippingFee;
     }
 
     public static Float calculateTotalTax(List<OrderItemDto> orderItems) {

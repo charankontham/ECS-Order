@@ -20,6 +20,7 @@ public class OrderFinalDto {
     private AddressDto shippingAddress;
     private List<ProductFinalDto> orderItems;
     private Float itemsSubTotal;
+    private Float shippingFee;
     private Float totalTax;
     private Float totalOrderValue;
     private LocalDateTime orderDate;

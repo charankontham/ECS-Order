@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Columns;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +32,18 @@ public class Order {
 
     @Column(name = "payment_status")
     private String paymentStatus;
+
+    @Column(name = "items_subtotal")
+    private Float itemsSubtotal;
+
+    @Column(name = "shipping_fee")
+    private Float shippingFee;
+
+    @Column(name = "total_tax")
+    private Float totalTax;
+
+    @Column(name = "total_order_amount")
+    private Float totalOrderAmount;
 
     @Column(name = "ordered_date")
     private LocalDateTime orderDate;

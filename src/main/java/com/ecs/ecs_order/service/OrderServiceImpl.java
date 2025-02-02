@@ -22,8 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -55,7 +54,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public List<OrderFinalDto> getAllOrdersByCustomerId(Integer customerId) {
-        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        List<Order> orders = orderRepository.findAllOrdersByCustomerIdOrderByOrderIdDesc(customerId);
         List<List<OrderItemDto>> listOfOrderItemsList = HelperFunctions.
                 getAllOrderItemsList(orders, orderItemRepository);
         AtomicInteger index = new AtomicInteger();
@@ -155,7 +154,7 @@ public class OrderServiceImpl implements IOrderService {
             invoiceData.setOrderDate(orderDto.getOrderDate());
             invoiceData.setOrderDate(orderDto.getDeliveryDate());
             invoiceData.setTotalTax(HelperFunctions.calculateTotalTax(orderItems));
-            invoiceData.setTotalOrderValue(HelperFunctions.calculateTotalPrice(orderItems));
+            invoiceData.setTotalOrderValue(HelperFunctions.calculateTotalPrice(orderItems, orderDto.getShippingFee()));
             invoiceData.setOrderId(orderDto.getOrderId());
             System.out.println("=== Ready to generate invoice ===");
             invoiceGeneratorService.generateInvoice("invoice.pdf", invoiceData);
@@ -166,7 +165,14 @@ public class OrderServiceImpl implements IOrderService {
             file.delete();
             System.out.println(s3Url);
         }
-        Order updatedOrder = orderRepository.save(OrderMapper.toOrder(orderDto));
+
+        Order existingOrder = orderRepository.findById(orderDto.getOrderId()).orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
+        existingOrder.setShippingStatus(orderDto.getShippingStatus());
+        existingOrder.setAddressId(orderDto.getAddressId());
+        existingOrder.setDeliveryDate(orderDto.getDeliveryDate());
+        existingOrder.setPaymentStatus(orderDto.getPaymentStatus());
+        existingOrder.setPaymentType(orderDto.getPaymentType());
+        Order updatedOrder = orderRepository.save(existingOrder);
         List<OrderItemDto> orderItemsList = HelperFunctions.getOrderItemsList(
                 orderDto.getOrderId(),
                 orderItemRepository
@@ -190,7 +196,7 @@ public class OrderServiceImpl implements IOrderService {
                     orderRequest.getOrderDetails().getCustomerId(),
                     customerService);
             if (Objects.equals(response, Constants.NoErrorFound)) {
-                Order savedOrder = orderRepository.save(OrderMapper.toOrder(orderRequest.getOrderDetails()));
+                Order savedOrder = orderRepository.save(OrderMapper.toOrder(orderRequest.getOrderDetails(), orderRequest.getOrderItems()));
                 orderRequest.getOrderItems()
                         .forEach(orderItem -> orderItem.setOrderId(savedOrder.getOrderId()));
                 orderItemRepository.saveAll(orderRequest.getOrderItems().stream().
@@ -223,6 +229,22 @@ public class OrderServiceImpl implements IOrderService {
     public List<OrderItemDto> getOrderItemsByProductId(Integer productId) {
         return orderItemRepository.findAllByProductId(productId).stream().
                 map(OrderItemMapper::mapToOrderItemDto).toList();
+    }
+
+    @Override
+    public List<ProductFinalDto> getOrderItemsByCustomerId(Integer customerId) {
+        List<ProductFinalDto> allUniqueOrderItems = new ArrayList<>();
+        Set<Integer> uniqueProducts = new LinkedHashSet<>();
+        getAllOrdersByCustomerId(customerId).forEach((order) -> {
+            order.getOrderItems().forEach(orderItem -> {
+                uniqueProducts.add(orderItem.getProductId());
+            });
+        });
+        System.out.println("uniqueProducts: " + uniqueProducts.stream().toList());
+        for(Integer productId : uniqueProducts) {
+            allUniqueOrderItems.add(productService.getProductById(productId).getBody());
+        }
+        return allUniqueOrderItems;
     }
 
     @Override

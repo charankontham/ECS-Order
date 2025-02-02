@@ -18,19 +18,24 @@ public class OrderMapper {
                 order.getAddressId(),
                 order.getPaymentType(),
                 order.getPaymentStatus(),
+                order.getShippingFee(),
                 order.getOrderDate(),
                 order.getDeliveryDate(),
                 order.getShippingStatus()
         );
     }
 
-    public static Order toOrder(OrderDto orderDto) {
+    public static Order toOrder(OrderDto orderDto, List<OrderItemDto> orderItems) {
         return new Order(
                 orderDto.getOrderId(),
                 orderDto.getCustomerId(),
                 orderDto.getAddressId(),
                 orderDto.getPaymentType(),
                 orderDto.getPaymentStatus(),
+                HelperFunctions.calculateSubTotalPrice(orderItems),
+                orderDto.getShippingFee(),
+                HelperFunctions.calculateTotalTax(orderItems),
+                HelperFunctions.calculateTotalPrice(orderItems,orderDto.getShippingFee()),
                 orderDto.getOrderDate(),
                 orderDto.getDeliveryDate(),
                 orderDto.getShippingStatus()
@@ -48,8 +53,9 @@ public class OrderMapper {
                 customerService.getAddressById(order.getAddressId()).getBody(),
                 ProductMapper.getProductFinalDtoListWithOrderItems(orderItemDtoList, productService),
                 HelperFunctions.calculateSubTotalPrice(orderItemDtoList),
+                order.getShippingFee(),
                 HelperFunctions.calculateTotalTax(orderItemDtoList),
-                HelperFunctions.calculateTotalPrice(orderItemDtoList),
+                HelperFunctions.calculateTotalPrice(orderItemDtoList, order.getShippingFee()),
                 order.getOrderDate(),
                 order.getDeliveryDate(),
                 order.getShippingStatus(),
