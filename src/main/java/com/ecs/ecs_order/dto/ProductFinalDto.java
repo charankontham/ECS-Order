@@ -13,7 +13,7 @@ public class ProductFinalDto {
     private Integer productId;
     private String productName;
     private ProductBrandDto brand;
-    private ProductCategoryDto productCategory;
+    private SubCategoryEnriched productSubCategory;
     private String productDescription;
     private Float productPrice;
     private Integer productQuantity;
