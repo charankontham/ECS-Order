@@ -8,26 +8,36 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class UserPrincipal implements UserDetails {
-    private final CustomerDto customerDto;
+    private final String username;
+    private final String password;
+    private final String role;
 
     public UserPrincipal(CustomerDto customerDto) {
-        this.customerDto = customerDto;
+        this.username = customerDto.getEmail();
+        this.password = customerDto.getPassword();
+        this.role = "ROLE_" + customerDto.getRole().toUpperCase();
+    }
+
+    public UserPrincipal(AdminDto adminDto) {
+        this.username = adminDto.getAdminUsername();
+        this.password = adminDto.getAdminPassword();
+        this.role = "ROLE_" + (adminDto.getAdminRole().getSubRole() + "_" +
+                adminDto.getAdminRole().getSubRole()).toUpperCase();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = "ROLE_" + customerDto.getRole().toUpperCase();
         return Collections.singleton(new SimpleGrantedAuthority(role));
     }
 
     @Override
     public String getPassword() {
-        return customerDto.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return customerDto.getEmail();
+        return username;
     }
 
     @Override
