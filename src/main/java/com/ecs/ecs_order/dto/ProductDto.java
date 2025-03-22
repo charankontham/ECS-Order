@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -21,6 +23,8 @@ public class ProductDto {
     private String productImage;
     private String productColor;
     private Float productWeight;
+    private LocalDateTime dateAdded;
+    private LocalDateTime dateModified;
     private String productDimensions;
     private String productCondition;
 }

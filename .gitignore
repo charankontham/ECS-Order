@@ -1,7 +1,7 @@
 HELP.md
 src/main/java/com/ecs/ecs_order/secret
 service-account-key.json
-do-not-commit/.env
+.env
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -34,6 +34,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### Customer files ###
-.env
