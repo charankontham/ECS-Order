@@ -11,7 +11,7 @@ public class AddressValidation {
     public static Object validateAddress(Integer addressId, Integer customerId, CustomerService customerService) {
         try {
             AddressDto addressDto = customerService.getAddressById(addressId).getBody();
-            if (!Objects.equals(Objects.requireNonNull(addressDto).getCustomerId(), customerId)) {
+            if (!Objects.equals(Objects.requireNonNull(addressDto).getUserId(), "customer_"+customerId)) {
                 return Constants.AddressNotFound;
             }
             return Constants.NoErrorFound;

@@ -27,13 +27,16 @@ public class UserAuthenticationDetails implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ResponseEntity<CustomerDto> customerResponse = customerService.getCustomerByEmail(username);
-        if (Objects.nonNull(customerResponse.getBody()) || customerResponse.getStatusCode() == HttpStatus.OK) {
-            return new UserPrincipal(customerResponse.getBody());
-        }
-        ResponseEntity<AdminDto> adminResponse = adminService.getByUsername(username);
-        if(adminResponse.getStatusCode() == HttpStatus.OK && Objects.nonNull(adminResponse.getBody())){
-            return new UserPrincipal(adminResponse.getBody());
+        try {
+            ResponseEntity<CustomerDto> customerResponse = customerService.getCustomerByEmail(username);
+            if (Objects.nonNull(customerResponse.getBody()) || customerResponse.getStatusCode() == HttpStatus.OK) {
+                return new UserPrincipal(customerResponse.getBody());
+            }
+        }catch (Exception e){
+            ResponseEntity<AdminDto> adminResponse = adminService.getByUsername(username);
+            if(adminResponse.getStatusCode() == HttpStatus.OK && Objects.nonNull(adminResponse.getBody())){
+                return new UserPrincipal(adminResponse.getBody());
+            }
         }
         throw new ResourceNotFoundException("User not found");
     }

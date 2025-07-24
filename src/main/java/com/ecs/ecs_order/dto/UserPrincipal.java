@@ -22,7 +22,7 @@ public class UserPrincipal implements UserDetails {
         this.username = adminDto.getAdminUsername();
         this.password = adminDto.getAdminPassword();
         this.role = "ROLE_" + (adminDto.getAdminRole().getSubRole() + "_" +
-                adminDto.getAdminRole().getSubRole()).toUpperCase();
+                adminDto.getAdminRole().getRoleName()).toUpperCase();
     }
 
     @Override
